@@ -1,0 +1,146 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class MyProgram {
+    //clear console
+    public static void clearConsole() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+   
+    public static void displayResults(List<String> destinations, List<Double> prices, int people, double budget, String type) {
+        clearConsole();
+        System.out.println(type.substring(0, 1).toUpperCase() + type.substring(1) + " destinations and their total costs: ");
+        System.out.println("------------------------------------------------------");
+        //clearConsole();
+        for (int i = 0; i < destinations.size(); i++) {
+            System.out.println(destinations.get(i) + " - Total cost for " + people + " people: $" + prices.get(i));
+            System.out.println("------------------------------------------------------");
+        }
+
+        //to check if destination falls within the budget
+        boolean withinBudget = false;
+        for (int i = 0; i < prices.size(); i++) {
+            if (prices.get(i) <= budget) {
+                withinBudget = true;
+                System.out.println("Destination within your budget: " + destinations.get(i) + " - Total cost: $" + prices.get(i));
+            }
+        }
+        //if none of the destinations fit within the budget
+        if (!withinBudget) {
+            System.out.println("\nUnfortunately, none of the " + type + " destinations are within your budget.");
+            System.out.println("Here are 3 tips to save money:");
+            System.out.println("1. Consider traveling during off-peak seasons to get better deals.");
+            System.out.println("2. Look for group discounts or travel packages.");
+            System.out.println("3. Be flexible with your travel dates and book in advance.");
+        }
+
+        //cheapest destination
+    if (!destinations.isEmpty()) {
+    double minCost = prices.get(0);
+    String cheapestDestination = destinations.get(0);
+    for (int i = 1; i < prices.size(); i++) {
+        if (prices.get(i) < minCost) {
+            minCost = prices.get(i);
+            cheapestDestination = destinations.get(i);
+        }
+    }
+    //rounds two decimal places
+    System.out.println("\nThe cheapest " + type + " destination is " + cheapestDestination + " with a total cost of $" + String.format("%.2f", minCost));
+}
+
+    }
+
+    public static void main(String[] args) {
+        Scanner reply = new Scanner(System.in);
+        List<String> domestic = new ArrayList<>();
+        List<Double> domesticPrices = new ArrayList<>();
+        List<String> international = new ArrayList<>();
+        List<Double> internationalPrices = new ArrayList<>();
+
+        clearConsole();
+
+        System.out.println("Hello\nDo you need help selecting where to travel to? y/n");
+        String answer = reply.next();
+
+        if (answer.equalsIgnoreCase("y")) {
+            clearConsole(); //clear console 
+            System.out.println("Welcome!");
+            System.out.println("Do you want to travel domestically or internationally?");
+            String domestorinternat = reply.next();
+
+            System.out.println("What is your total budget?");
+            double budget = reply.nextDouble();
+            reply.nextLine(); 
+
+            if (domestorinternat.equalsIgnoreCase("domestically")) {
+                System.out.println("How many people are travelling?");
+                int people = reply.nextInt();
+                reply.nextLine(); 
+
+                while (true) {
+                    System.out.println("Enter a possible domestic destination:");
+                    String destination = reply.nextLine();
+                    System.out.println("Enter the estimated total cost for " + destination + " per person:");
+                    double costPerPerson = reply.nextDouble();
+                    double totalCost = costPerPerson * people;
+                    reply.nextLine(); 
+
+                    domestic.add(destination);
+                    domesticPrices.add(totalCost);
+
+                    System.out.println("Would you like to add more destinations? y/n");
+                    String choice1 = reply.nextLine();
+                    if (!choice1.equalsIgnoreCase("y")) {
+                        break;
+                    }
+                }
+                displayResults(domestic, domesticPrices, people, budget, "domestic");
+
+            } else if (domestorinternat.equalsIgnoreCase("internationally")) {
+                System.out.println("How many people are travelling?");
+                int people = reply.nextInt();
+                reply.nextLine(); 
+
+                while (true) {
+                    System.out.println("Enter a possible international destination:");
+                    String place = reply.nextLine();
+                    System.out.println("Enter the estimated total cost for " + place + " per person:");
+                    double costPerPerson = reply.nextDouble();
+                    double totalCost = costPerPerson * people;
+                    reply.nextLine(); 
+
+                    international.add(place);
+                    internationalPrices.add(totalCost);
+
+                    System.out.println("Would you like to add more destinations? y/n");
+                    String choice2 = reply.nextLine();
+                    if (!choice2.equalsIgnoreCase("y")) {
+                        break;
+                    }
+                }
+                displayResults(international, internationalPrices, people, budget, "international");
+
+            } else {
+                System.out.println("You didn't select a valid option. Please choose either 'domestically' or 'internationally'.");
+            }
+        } else if (answer.equalsIgnoreCase("n")) {
+            System.out.println("Alright, have a great day!");
+        } else {
+            System.out.println("Invalid response. Please enter 'y' or 'n'.");
+        }
+
+        reply.close();
+    }
+}
